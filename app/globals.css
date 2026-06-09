@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:root {
+  --dms-bg: #0a0f1a;
+  --dms-surface: #111827;
+  --dms-surface-raised: #1e293b;
+  --dms-border: rgba(255, 255, 255, 0.08);
+  --dms-border-hover: rgba(255, 255, 255, 0.15);
+  --dms-primary: #10b981;
+  --dms-primary-hover: #34d399;
+  --dms-primary-muted: rgba(16, 185, 129, 0.12);
+  --dms-text: #f1f5f9;
+  --dms-text-secondary: #94a3b8;
+  --dms-text-muted: #64748b;
+  --dms-danger: #ef4444;
+  --dms-danger-muted: rgba(239, 68, 68, 0.12);
+  --dms-warning: #f59e0b;
+  --dms-sidebar-width: 260px;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@theme inline {
+  --color-background: var(--dms-bg);
+  --color-foreground: var(--dms-text);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--dms-surface-raised) transparent;
+}
+
+body {
+  background: var(--dms-bg);
+  color: var(--dms-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 40px var(--dms-surface) inset;
+  -webkit-text-fill-color: var(--dms-text);
+  caret-color: var(--dms-text);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
