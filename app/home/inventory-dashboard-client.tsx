@@ -246,8 +246,8 @@ export default function InventoryDashboardClient() {
                     <DetailCell label="Pcs per Pack" value={String(item.units_per_pack)} />
                     <DetailCell label="Packs Available" value={String(packs)} highlight />
                     <DetailCell label="Weight" value={`${toNum(item.weight_grams)}g`} />
-                    <DetailCell label="Buy Price" value={`$${toNum(item.purchase_price).toFixed(2)}`} />
-                    <DetailCell label="Sell Price" value={`$${toNum(item.selling_price).toFixed(2)}`} highlight />
+                    <DetailCell label="Buy Price" value={`Rs. ${toNum(item.purchase_price).toFixed(2)}`} />
+                    <DetailCell label="Sell Price" value={`Rs. ${toNum(item.selling_price).toFixed(2)}`} highlight />
                     <DetailCell label="Last Updated" value={formatDate(item.updated_at)} span />
                   </div>
                 </div>
@@ -291,10 +291,10 @@ export default function InventoryDashboardClient() {
                       {toNum(item.weight_grams)}g
                     </td>
                     <td className="px-5 py-3.5 text-right font-mono text-[var(--dms-text-secondary)]">
-                      ${toNum(item.purchase_price).toFixed(2)}
+                      Rs. {toNum(item.purchase_price).toFixed(2)}
                     </td>
                     <td className="px-5 py-3.5 text-right font-mono font-semibold text-[var(--dms-primary)]">
-                      ${toNum(item.selling_price).toFixed(2)}
+                      Rs. {toNum(item.selling_price).toFixed(2)}
                     </td>
                     <td className="px-5 py-3.5 text-center text-[var(--dms-text-secondary)]">
                       {item.units_per_pack}

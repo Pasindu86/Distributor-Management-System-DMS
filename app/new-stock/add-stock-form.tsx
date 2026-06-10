@@ -159,7 +159,7 @@ export default function AddStockForm() {
         </div>
         <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Shipment Value</p>
-          <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">${totalValue.toFixed(2)}</p>
+          <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">Rs. {totalValue.toFixed(2)}</p>
         </div>
       </div>
 
@@ -231,7 +231,7 @@ export default function AddStockForm() {
           <div>
             <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Total Value</p>
             <p className="mt-0.5 text-xs text-[var(--dms-text-muted)]">
-              Auto: ${calculatedTotal.toFixed(2)} — override if different
+              Auto: Rs. {calculatedTotal.toFixed(2)} — override if different
             </p>
           </div>
           <input
