@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
+/* ─── Dark Theme (default) ─── */
 :root {
   --dms-bg: #0a0f1a;
   --dms-surface: #111827;
   --dms-surface-raised: #1e293b;
+  --dms-card-bg: rgba(255, 255, 255, 0.02);
+  --dms-card-border: rgba(255, 255, 255, 0.06);
+  --dms-input-border: rgba(255, 255, 255, 0.08);
+  --dms-hover-bg: rgba(255, 255, 255, 0.05);
+  --dms-hover-bg-strong: rgba(255, 255, 255, 0.10);
   --dms-border: rgba(255, 255, 255, 0.08);
   --dms-border-hover: rgba(255, 255, 255, 0.15);
   --dms-primary: #10b981;
@@ -18,6 +24,29 @@
   --dms-sidebar-width: 260px;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+/* ─── Light Theme ─── */
+[data-theme="light"] {
+  --dms-bg: #f4f6f9;
+  --dms-surface: #ffffff;
+  --dms-surface-raised: #f0f2f5;
+  --dms-card-bg: rgba(0, 0, 0, 0.015);
+  --dms-card-border: rgba(0, 0, 0, 0.08);
+  --dms-input-border: rgba(0, 0, 0, 0.12);
+  --dms-hover-bg: rgba(0, 0, 0, 0.04);
+  --dms-hover-bg-strong: rgba(0, 0, 0, 0.07);
+  --dms-border: rgba(0, 0, 0, 0.08);
+  --dms-border-hover: rgba(0, 0, 0, 0.15);
+  --dms-primary: #059669;
+  --dms-primary-hover: #10b981;
+  --dms-primary-muted: rgba(5, 150, 105, 0.10);
+  --dms-text: #1e293b;
+  --dms-text-secondary: #475569;
+  --dms-text-muted: #94a3b8;
+  --dms-danger: #dc2626;
+  --dms-danger-muted: rgba(220, 38, 38, 0.08);
+  --dms-warning: #d97706;
 }
 
 @theme inline {

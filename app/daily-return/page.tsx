@@ -9,12 +9,12 @@ export default function DailyReturnPage() {
     const tabs = [
         {
             id: "add",
-            label: "New",
+            label: "Add Daily Return",
             content: <AddDailyReturnForm />,
         },
         {
             id: "history",
-            label: "History",
+            label: "Return History",
             content: <ReturnHistory />,
         },
     ];

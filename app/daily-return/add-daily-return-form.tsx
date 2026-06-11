@@ -160,7 +160,7 @@ export default function AddDailyReturnForm() {
         <form onSubmit={handleSubmit} className="space-y-5">
             {success && (
                 <div className="rounded-xl border border-[var(--dms-primary)]/20 bg-[var(--dms-primary-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-primary)]">
-                    Saved successfully.
+                    Daily return recorded successfully. Stock updated.
                 </div>
             )}
 
@@ -199,7 +199,7 @@ export default function AddDailyReturnForm() {
             {/* Product List with Search */}
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Items</p>
+                    <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Products</p>
                     <span className="text-xs text-[var(--dms-text-muted)]">{activeEntries.length} selected</span>
                 </div>
 
@@ -286,7 +286,7 @@ export default function AddDailyReturnForm() {
                         Saving...
                     </span>
                 ) : (
-                    "Save"
+                    "Record Daily Return"
                 )}
             </button>
         </form>

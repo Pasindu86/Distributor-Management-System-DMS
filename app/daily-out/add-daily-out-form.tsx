@@ -188,19 +188,19 @@ export default function AddDailyOutForm() {
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Products</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{inventoryItems.length}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Pieces Out</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{totalPiecesAdding.toLocaleString()}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Total Selling</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">Rs. {totalSellingPrice.toFixed(2)}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Profit</p>
           <p className={`mt-1 text-lg font-bold ${totalProfit >= 0 ? "text-[var(--dms-primary)]" : "text-[var(--dms-danger)]"}`}>
             Rs. {totalProfit.toFixed(2)}
@@ -220,7 +220,7 @@ export default function AddDailyOutForm() {
             value={outDate}
             onChange={(e) => setOutDate(e.target.value)}
             required
-            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+            className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
           />
         </div>
 
@@ -234,7 +234,7 @@ export default function AddDailyOutForm() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. Route A delivery"
-            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+            className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
           />
         </div>
       </div>
@@ -253,11 +253,11 @@ export default function AddDailyOutForm() {
           </svg>
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name, type, or weight..."
-            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] pl-10 pr-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30" />
+            className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] pl-10 pr-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30" />
         </div>
 
         {/* All Products */}
-        <div className="max-h-[420px] space-y-2 overflow-y-auto rounded-xl border border-white/[0.06] bg-white/[0.01] p-2">
+        <div className="max-h-[420px] space-y-2 overflow-y-auto rounded-xl border border-[var(--dms-card-border)] bg-white/[0.01] p-2">
           {filtered.length === 0 ? (
             <p className="px-3 py-6 text-center text-xs text-[var(--dms-text-muted)]">No products match your search.</p>
           ) : (
@@ -267,7 +267,7 @@ export default function AddDailyOutForm() {
               const isActive = entry.pieces > 0;
               return (
                 <div key={item.item_id}
-                  className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-primary)]/30 bg-[var(--dms-primary)]/5" : "border-white/[0.06] bg-white/[0.02]"}`}>
+                  className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-primary)]/30 bg-[var(--dms-primary)]/5" : "border-[var(--dms-card-border)] bg-[var(--dms-card-bg)]"}`}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-[var(--dms-text)]">{item.item_name}</p>
@@ -281,14 +281,14 @@ export default function AddDailyOutForm() {
                         <input type="number" min={0} value={entry.packs || ""}
                           onChange={(e) => updateEntry(item.item_id, "packs", Number(e.target.value))}
                           placeholder="0"
-                          className="w-14 rounded-lg border border-white/[0.08] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+                          className="w-14 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
                       </div>
                       <div className="flex items-center gap-1">
                         <label className="text-[10px] text-[var(--dms-text-muted)]">Pcs</label>
                         <input type="number" min={0} value={entry.pieces || ""}
                           onChange={(e) => updateEntry(item.item_id, "pieces", Number(e.target.value))}
                           placeholder="0"
-                          className="w-14 rounded-lg border border-white/[0.08] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+                          className="w-14 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
                       </div>
                     </div>
                   </div>
@@ -306,7 +306,7 @@ export default function AddDailyOutForm() {
       </div>
 
       {/* Discount & Summary */}
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-4">
+      <div className="rounded-xl border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-4 space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
           <div className="flex-1 space-y-1.5">
             <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Discount</p>
@@ -316,7 +316,7 @@ export default function AddDailyOutForm() {
                 onClick={() => setDiscountType("fixed")}
                 className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "fixed"
                     ? "bg-[var(--dms-primary)] text-slate-950"
-                    : "border border-white/[0.08] bg-white/5 text-[var(--dms-text-secondary)] hover:bg-white/10"
+                    : "border border-[var(--dms-input-border)] bg-[var(--dms-hover-bg)] text-[var(--dms-text-secondary)] hover:bg-[var(--dms-hover-bg-strong)]"
                   }`}
               >
                 Fixed (Rs.)
@@ -326,7 +326,7 @@ export default function AddDailyOutForm() {
                 onClick={() => setDiscountType("percentage")}
                 className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "percentage"
                     ? "bg-[var(--dms-primary)] text-slate-950"
-                    : "border border-white/[0.08] bg-white/5 text-[var(--dms-text-secondary)] hover:bg-white/10"
+                    : "border border-[var(--dms-input-border)] bg-[var(--dms-hover-bg)] text-[var(--dms-text-secondary)] hover:bg-[var(--dms-hover-bg-strong)]"
                   }`}
               >
                 Percentage (%)
@@ -341,12 +341,12 @@ export default function AddDailyOutForm() {
               value={discountValue}
               onChange={(e) => setDiscountValue(e.target.value)}
               placeholder={discountType === "fixed" ? "0.00" : "0"}
-              className="w-full rounded-lg border border-white/[0.08] bg-[var(--dms-surface-raised)] px-3 py-2.5 text-right text-sm font-mono font-semibold text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50"
+              className="w-full rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-3 py-2.5 text-right text-sm font-mono font-semibold text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50"
             />
           </div>
         </div>
 
-        <div className="border-t border-white/[0.06] pt-3 space-y-2">
+        <div className="border-t border-[var(--dms-card-border)] pt-3 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-[var(--dms-text-muted)]">Total Selling Price</span>
             <span className="font-mono font-medium text-[var(--dms-text)]">Rs. {totalSellingPrice.toFixed(2)}</span>
@@ -367,7 +367,7 @@ export default function AddDailyOutForm() {
             <span className="text-[var(--dms-text-muted)]">Total Buying Cost</span>
             <span className="font-mono font-medium text-[var(--dms-text)]">Rs. {totalBuyingCost.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-sm font-semibold border-t border-white/[0.06] pt-2">
+          <div className="flex justify-between text-sm font-semibold border-t border-[var(--dms-card-border)] pt-2">
             <span className="text-[var(--dms-text-secondary)]">Profit</span>
             <span className={`font-mono ${totalProfit >= 0 ? "text-[var(--dms-primary)]" : "text-[var(--dms-danger)]"}`}>
               Rs. {totalProfit.toFixed(2)}

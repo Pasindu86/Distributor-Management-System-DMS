@@ -63,7 +63,7 @@ export default function AddProductForm() {
   }
 
   const inputClass =
-    "w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30";
+    "w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -79,7 +79,7 @@ export default function AddProductForm() {
       )}
 
       {/* Product Info */}
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-4">
+      <div className="rounded-xl border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-4 space-y-4">
         <p className="text-sm font-semibold text-[var(--dms-text-secondary)]">Product Information</p>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -133,7 +133,7 @@ export default function AddProductForm() {
       </div>
 
       {/* Pricing */}
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-4">
+      <div className="rounded-xl border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-4 space-y-4">
         <p className="text-sm font-semibold text-[var(--dms-text-secondary)]">Pricing</p>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -158,7 +158,7 @@ export default function AddProductForm() {
 
         {/* Profit preview */}
         {(Number(form.purchase_price) > 0 || Number(form.selling_price) > 0) && (
-          <div className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-2.5">
+          <div className="flex items-center justify-between rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] px-4 py-2.5">
             <span className="text-xs font-medium text-[var(--dms-text-muted)]">Profit per unit</span>
             <span className={`font-mono text-sm font-bold ${profit >= 0 ? "text-[var(--dms-primary)]" : "text-[var(--dms-danger)]"}`}>
               Rs. {profit.toFixed(2)}

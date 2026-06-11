@@ -108,7 +108,7 @@ export default function PurchaseHistory() {
   if (shipments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--dms-hover-bg)]">
           <svg className="h-6 w-6 text-[var(--dms-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
@@ -128,7 +128,7 @@ export default function PurchaseHistory() {
           <div
             key={s.shipment_id}
             className={`rounded-xl border transition ${
-              isExpanded ? "border-[var(--dms-primary)]/20 bg-white/[0.03]" : "border-white/[0.06] bg-white/[0.015]"
+              isExpanded ? "border-[var(--dms-primary)]/20 bg-white/[0.03]" : "border-[var(--dms-card-border)] bg-white/[0.015]"
             }`}
           >
             {/* Shipment header */}
@@ -171,7 +171,7 @@ export default function PurchaseHistory() {
 
             {/* Expanded items */}
             {isExpanded && (
-              <div className="border-t border-white/[0.06] px-4 py-3">
+              <div className="border-t border-[var(--dms-card-border)] px-4 py-3">
                 {loadingItems ? (
                   <div className="flex items-center justify-center py-4">
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--dms-primary)] border-t-transparent" />
@@ -190,7 +190,7 @@ export default function PurchaseHistory() {
                       return (
                         <div
                           key={si.id}
-                          className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3"
+                          className="rounded-lg border border-white/[0.04] bg-[var(--dms-card-bg)] p-3"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">

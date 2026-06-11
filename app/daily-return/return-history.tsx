@@ -110,7 +110,7 @@ export default function ReturnHistory() {
     if (records.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--dms-hover-bg)]">
                     <svg className="h-6 w-6 text-[var(--dms-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                     </svg>
@@ -129,7 +129,7 @@ export default function ReturnHistory() {
                 return (
                     <div
                         key={r.return_id}
-                        className={`rounded-xl border transition ${isExpanded ? "border-[var(--dms-warning)]/20 bg-white/[0.03]" : "border-white/[0.06] bg-white/[0.015]"
+                        className={`rounded-xl border transition ${isExpanded ? "border-[var(--dms-warning)]/20 bg-white/[0.03]" : "border-[var(--dms-card-border)] bg-white/[0.015]"
                             }`}
                     >
                         <button
@@ -170,7 +170,7 @@ export default function ReturnHistory() {
                         </button>
 
                         {isExpanded && (
-                            <div className="border-t border-white/[0.06] px-4 py-3">
+                            <div className="border-t border-[var(--dms-card-border)] px-4 py-3">
                                 {/* Summary row */}
                                 <div className="mb-3 grid grid-cols-2 gap-2">
                                     <DetailCell label="Return Value" value={`Rs. ${toNum(r.total_return_value).toFixed(2)}`} highlight />
@@ -193,7 +193,7 @@ export default function ReturnHistory() {
                                             return (
                                                 <div
                                                     key={item.id}
-                                                    className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3"
+                                                    className="rounded-lg border border-white/[0.04] bg-[var(--dms-card-bg)] p-3"
                                                 >
                                                     <div className="flex items-center justify-between gap-2">
                                                         <div className="min-w-0">

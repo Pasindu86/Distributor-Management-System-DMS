@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { useTheme } from "@/lib/theme-context";
 import { supabase } from "@/lib/supabase/client";
 
 const navItems = [
@@ -65,11 +66,11 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile top bar */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center border-b border-white/[0.08] bg-[var(--dms-surface)]/95 px-4 py-3 backdrop-blur-md lg:hidden">
+      <header className="fixed top-0 left-0 right-0 z-40 flex items-center border-b border-[var(--dms-input-border)] bg-[var(--dms-surface)]/95 px-4 py-3 backdrop-blur-md lg:hidden">
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="mr-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/5 text-[var(--dms-text-secondary)] transition hover:bg-white/10"
+          className="mr-3 flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-hover-bg)] text-[var(--dms-text-secondary)] transition hover:bg-[var(--dms-hover-bg-strong)]"
           aria-label="Open menu"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -93,14 +94,14 @@ export default function Sidebar() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             aria-label="Close menu"
           />
-          <aside className="absolute left-0 top-0 h-full w-[280px] animate-[slideIn_0.2s_ease-out] border-r border-white/[0.08] bg-[var(--dms-surface)] p-4">
+          <aside className="absolute left-0 top-0 h-full w-[280px] animate-[slideIn_0.2s_ease-out] border-r border-[var(--dms-input-border)] bg-[var(--dms-surface)] p-4">
             <SidebarContent pathname={pathname} onNavigate={() => setIsOpen(false)} />
           </aside>
         </div>
       )}
 
       {/* Desktop persistent sidebar */}
-      <aside className="fixed left-0 top-0 hidden h-screen w-[var(--dms-sidebar-width)] border-r border-white/[0.08] bg-[var(--dms-surface)] p-4 lg:block">
+      <aside className="fixed left-0 top-0 hidden h-screen w-[var(--dms-sidebar-width)] border-r border-[var(--dms-input-border)] bg-[var(--dms-surface)] p-4 lg:block">
         <SidebarContent pathname={pathname} />
       </aside>
     </>
@@ -115,6 +116,7 @@ function SidebarContent({
   onNavigate?: () => void;
 }) {
   const { role, user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
 
   async function handleLogout() {
@@ -146,7 +148,7 @@ function SidebarContent({
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                 isActive
                   ? "bg-[var(--dms-primary-muted)] text-[var(--dms-primary-hover)]"
-                  : "text-[var(--dms-text-secondary)] hover:bg-white/5 hover:text-[var(--dms-text)]"
+                  : "text-[var(--dms-text-secondary)] hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-text)]"
               }`}
             >
               <span className={isActive ? "text-[var(--dms-primary)]" : ""}>{item.icon}</span>
@@ -157,7 +159,25 @@ function SidebarContent({
       </nav>
 
       {/* Bottom section */}
-      <div className="border-t border-white/[0.08] pt-4">
+      <div className="border-t border-[var(--dms-input-border)] pt-4 space-y-3">
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[var(--dms-text-secondary)] transition hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-text)]"
+        >
+          {theme === "dark" ? (
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          ) : (
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          )}
+          {theme === "dark" ? "Light mode" : "Dark mode"}
+        </button>
+
+        {/* User info */}
         <div className="flex items-center justify-between rounded-xl px-3 py-2.5">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--dms-surface-raised)] text-xs font-semibold text-[var(--dms-text-secondary)]">
@@ -170,7 +190,7 @@ function SidebarContent({
           </div>
           <button 
             onClick={handleLogout}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--dms-text-muted)] transition hover:bg-white/5 hover:text-[var(--dms-danger)]"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--dms-text-muted)] transition hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-danger)]"
             title="Log out"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -182,3 +202,4 @@ function SidebarContent({
     </div>
   );
 }
+

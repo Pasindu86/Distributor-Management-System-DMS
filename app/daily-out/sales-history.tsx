@@ -115,7 +115,7 @@ export default function SalesHistory() {
   if (records.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--dms-hover-bg)]">
           <svg className="h-6 w-6 text-[var(--dms-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
@@ -136,7 +136,7 @@ export default function SalesHistory() {
           <div
             key={r.out_id}
             className={`rounded-xl border transition ${
-              isExpanded ? "border-[var(--dms-primary)]/20 bg-white/[0.03]" : "border-white/[0.06] bg-white/[0.015]"
+              isExpanded ? "border-[var(--dms-primary)]/20 bg-white/[0.03]" : "border-[var(--dms-card-border)] bg-white/[0.015]"
             }`}
           >
             <button
@@ -180,7 +180,7 @@ export default function SalesHistory() {
             </button>
 
             {isExpanded && (
-              <div className="border-t border-white/[0.06] px-4 py-3">
+              <div className="border-t border-[var(--dms-card-border)] px-4 py-3">
                 {/* Summary row */}
                 <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <DetailCell label="Total Selling" value={`Rs. ${toNum(r.total_selling_price).toFixed(2)}`} />
@@ -213,7 +213,7 @@ export default function SalesHistory() {
                       return (
                         <div
                           key={item.id}
-                          className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3"
+                          className="rounded-lg border border-white/[0.04] bg-[var(--dms-card-bg)] p-3"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">

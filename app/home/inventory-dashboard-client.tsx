@@ -119,7 +119,7 @@ export default function InventoryDashboardClient() {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--dms-hover-bg)]">
             <svg className="h-5 w-5 text-[var(--dms-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
@@ -134,19 +134,19 @@ export default function InventoryDashboardClient() {
     <div>
       {/* Stats cards */}
       <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Total Items</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{items.length}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Total Pieces</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{totalPieces.toLocaleString()}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Total Packs</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">{totalPacks.toLocaleString()}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Stock Status</p>
           <p className="mt-1 text-sm">
             <span className="font-bold text-[var(--dms-primary)]">{inStockCount}</span>
@@ -167,7 +167,7 @@ export default function InventoryDashboardClient() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, category, or weight..."
-            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] py-2.5 pl-10 pr-4 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+            className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] py-2.5 pl-10 pr-4 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
           />
           {search && (
             <button
@@ -198,7 +198,7 @@ export default function InventoryDashboardClient() {
             <div
               key={item.item_id}
               className={`rounded-xl border transition ${
-                isExpanded ? "border-[var(--dms-primary)]/20 bg-white/[0.03]" : "border-white/[0.06] bg-white/[0.015]"
+                isExpanded ? "border-[var(--dms-primary)]/20 bg-white/[0.03]" : "border-[var(--dms-card-border)] bg-white/[0.015]"
               }`}
             >
               <button
@@ -240,7 +240,7 @@ export default function InventoryDashboardClient() {
               </button>
 
               {isExpanded && (
-                <div className="border-t border-white/[0.06] px-4 py-3">
+                <div className="border-t border-[var(--dms-card-border)] px-4 py-3">
                   <div className="grid grid-cols-2 gap-y-3 gap-x-4">
                     <DetailCell label="Total Pieces" value={String(item.stock_quantity)} />
                     <DetailCell label="Pcs per Pack" value={String(item.units_per_pack)} />
@@ -259,10 +259,10 @@ export default function InventoryDashboardClient() {
 
       {/* Desktop table layout */}
       <div className="hidden lg:block">
-        <div className="overflow-x-auto rounded-lg border border-white/[0.06]">
+        <div className="overflow-x-auto rounded-lg border border-[var(--dms-card-border)]">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-white/[0.08] bg-white/[0.02]">
+              <tr className="border-b border-[var(--dms-input-border)] bg-[var(--dms-card-bg)]">
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">#</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Item Name</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Category</th>
@@ -279,11 +279,11 @@ export default function InventoryDashboardClient() {
               {filtered.map((item) => {
                 const packs = unitsStock(item);
                 return (
-                  <tr key={item.item_id} className="transition hover:bg-white/[0.02]">
+                  <tr key={item.item_id} className="transition hover:bg-[var(--dms-card-bg)]">
                     <td className="px-5 py-3.5 font-mono text-xs text-[var(--dms-text-muted)]">{item.item_id}</td>
                     <td className="px-5 py-3.5 font-medium text-[var(--dms-text)]">{item.item_name}</td>
                     <td className="px-5 py-3.5">
-                      <span className="inline-flex rounded-md bg-white/5 px-2 py-0.5 text-xs font-medium text-[var(--dms-text-secondary)]">
+                      <span className="inline-flex rounded-md bg-[var(--dms-hover-bg)] px-2 py-0.5 text-xs font-medium text-[var(--dms-text-secondary)]">
                         {item.item_type}
                       </span>
                     </td>

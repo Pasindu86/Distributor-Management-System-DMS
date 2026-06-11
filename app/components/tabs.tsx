@@ -19,7 +19,7 @@ export default function Tabs({ tabs, defaultTab }: TabsProps) {
   return (
     <div>
       {/* Tab header */}
-      <div className="flex gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
+      <div className="flex gap-1 rounded-xl border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -28,7 +28,7 @@ export default function Tabs({ tabs, defaultTab }: TabsProps) {
             className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition ${
               activeTab === tab.id
                 ? "bg-[var(--dms-primary)] text-slate-950 shadow-sm"
-                : "text-[var(--dms-text-secondary)] hover:bg-white/5 hover:text-[var(--dms-text)]"
+                : "text-[var(--dms-text-secondary)] hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-text)]"
             }`}
           >
             {tab.label}

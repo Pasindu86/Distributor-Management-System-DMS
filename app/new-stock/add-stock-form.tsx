@@ -161,19 +161,19 @@ export default function AddStockForm() {
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Current Stock</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{totalCurrentStock.toLocaleString()}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Total Packs</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">{totalPacks.toLocaleString()}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Adding Now</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{totalPiecesAdding.toLocaleString()}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Shipment Value</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">Rs. {totalValue.toFixed(2)}</p>
         </div>
@@ -191,7 +191,7 @@ export default function AddStockForm() {
             value={stockDate}
             onChange={(e) => setStockDate(e.target.value)}
             required
-            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+            className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
           />
         </div>
 
@@ -205,7 +205,7 @@ export default function AddStockForm() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. Supplier invoice #123"
-            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+            className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
           />
         </div>
       </div>
@@ -224,11 +224,11 @@ export default function AddStockForm() {
           </svg>
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name, type, or weight..."
-            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] pl-10 pr-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30" />
+            className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] pl-10 pr-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30" />
         </div>
 
         {/* All Products */}
-        <div className="max-h-[420px] space-y-2 overflow-y-auto rounded-xl border border-white/[0.06] bg-white/[0.01] p-2">
+        <div className="max-h-[420px] space-y-2 overflow-y-auto rounded-xl border border-[var(--dms-card-border)] bg-white/[0.01] p-2">
           {filtered.length === 0 ? (
             <p className="px-3 py-6 text-center text-xs text-[var(--dms-text-muted)]">No products match your search.</p>
           ) : (
@@ -238,7 +238,7 @@ export default function AddStockForm() {
               const isActive = entry.pieces > 0;
               return (
                 <div key={item.item_id}
-                  className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-primary)]/30 bg-[var(--dms-primary)]/5" : "border-white/[0.06] bg-white/[0.02]"}`}>
+                  className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-primary)]/30 bg-[var(--dms-primary)]/5" : "border-[var(--dms-card-border)] bg-[var(--dms-card-bg)]"}`}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-[var(--dms-text)]">{item.item_name}</p>
@@ -252,14 +252,14 @@ export default function AddStockForm() {
                         <input type="number" min={0} value={entry.packs || ""}
                           onChange={(e) => updateEntry(item.item_id, "packs", Number(e.target.value))}
                           placeholder="0"
-                          className="w-14 rounded-lg border border-white/[0.08] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+                          className="w-14 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
                       </div>
                       <div className="flex items-center gap-1">
                         <label className="text-[10px] text-[var(--dms-text-muted)]">Pcs</label>
                         <input type="number" min={0} value={entry.pieces || ""}
                           onChange={(e) => updateEntry(item.item_id, "pieces", Number(e.target.value))}
                           placeholder="0"
-                          className="w-14 rounded-lg border border-white/[0.08] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+                          className="w-14 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
                       </div>
                     </div>
                   </div>
@@ -277,7 +277,7 @@ export default function AddStockForm() {
       </div>
 
       {/* Total Value */}
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+      <div className="rounded-xl border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div>
             <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Total Value</p>
@@ -292,7 +292,7 @@ export default function AddStockForm() {
             value={manualTotal}
             onChange={(e) => setManualTotal(e.target.value)}
             placeholder={calculatedTotal.toFixed(2)}
-            className="w-full rounded-lg border border-white/[0.08] bg-[var(--dms-surface-raised)] px-3 py-2.5 text-right text-sm font-mono font-semibold text-[var(--dms-primary)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 sm:w-36"
+            className="w-full rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-3 py-2.5 text-right text-sm font-mono font-semibold text-[var(--dms-primary)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 sm:w-36"
           />
         </div>
       </div>
