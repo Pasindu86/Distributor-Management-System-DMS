@@ -217,9 +217,8 @@ export default function InventoryDashboardClient() {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-[var(--dms-text)]">{item.item_name}</p>
-                  <p className="mt-0.5 text-xs text-[var(--dms-text-muted)]">
-                    {item.item_type} · {toNum(item.weight_grams)}g
+                  <p className="text-sm font-semibold text-[var(--dms-text)] leading-snug">
+                    {item.item_name} - {item.item_type} - {toNum(item.weight_grams)}g
                   </p>
                 </div>
 
