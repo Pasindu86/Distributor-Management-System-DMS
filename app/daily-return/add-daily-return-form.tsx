@@ -23,18 +23,16 @@ function toNum(v: number | string) {
   return typeof v === "number" ? v : Number(v);
 }
 
-export default function AddDailyOutForm() {
+export default function AddDailyReturnForm() {
   const [inventoryItems, setInventoryItems] = useState<InventoryOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [outDate, setOutDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [returnDate, setReturnDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [notes, setNotes] = useState("");
   const [entries, setEntries] = useState<Record<number, ProductEntry>>({});
-  const [discountType, setDiscountType] = useState<"fixed" | "percentage">("fixed");
-  const [discountValue, setDiscountValue] = useState<string>("");
 
   useEffect(() => {
     async function loadItems() {
@@ -50,32 +48,18 @@ export default function AddDailyOutForm() {
 
   const activeEntries = Object.entries(entries).filter(([, e]) => e.pieces > 0);
 
-  const totalSellingPrice = activeEntries.reduce((sum, [id, e]) => {
+  const totalReturnValue = activeEntries.reduce((sum, [id, e]) => {
     const item = inventoryItems.find((i) => i.item_id === Number(id));
     if (!item) return sum;
     return sum + e.pieces * toNum(item.selling_price);
   }, 0);
 
-  const totalBuyingCost = activeEntries.reduce((sum, [id, e]) => {
-    const item = inventoryItems.find((i) => i.item_id === Number(id));
-    if (!item) return sum;
-    return sum + e.pieces * toNum(item.purchase_price);
-  }, 0);
-
-  const discountAmount =
-    discountType === "fixed"
-      ? Number(discountValue) || 0
-      : (totalSellingPrice * (Number(discountValue) || 0)) / 100;
-
-  const finalAmount = totalSellingPrice - discountAmount;
-  const totalProfit = finalAmount - totalBuyingCost;
-  const totalPiecesAdding = activeEntries.reduce((s, [, e]) => s + e.pieces, 0);
+  const totalPiecesReturning = activeEntries.reduce((s, [, e]) => s + e.pieces, 0);
 
   function updateEntry(itemId: number, field: "packs" | "pieces", value: number) {
     const item = inventoryItems.find((i) => i.item_id === itemId);
     const unitsPerPack = item?.units_per_pack ?? 1;
     setEntries((prev) => {
-      const cur = prev[itemId] ?? { packs: 0, pieces: 0 };
       if (field === "packs") {
         return { ...prev, [itemId]: { packs: value, pieces: value * unitsPerPack } };
       }
@@ -101,49 +85,45 @@ export default function AddDailyOutForm() {
     setSubmitting(true);
     setSuccess(false);
 
-    const { data: dailyOut, error: outErr } = await supabase
-      .from("daily_out")
+    const { data: dailyReturn, error: retErr } = await supabase
+      .from("daily_return")
       .insert({
-        out_date: outDate,
-        total_selling_price: totalSellingPrice,
-        discount_type: discountType,
-        discount_value: Number(discountValue) || 0,
-        discount_amount: discountAmount,
-        final_amount: finalAmount,
-        total_profit: totalProfit,
+        return_date: returnDate,
+        total_return_value: totalReturnValue,
         notes: notes || null,
       })
-      .select("out_id")
+      .select("return_id")
       .single();
 
-    if (outErr || !dailyOut) {
-      alert("Failed to create daily out record: " + (outErr?.message ?? "Unknown error"));
+    if (retErr || !dailyReturn) {
+      alert("Failed to create daily return record: " + (retErr?.message ?? "Unknown error"));
       setSubmitting(false);
       return;
     }
 
-    const outItems = validLines.map((li) => {
+    const returnItems = validLines.map((li) => {
       const item = inventoryItems.find((i) => i.item_id === li.item_id)!;
       return {
-        out_id: dailyOut.out_id,
+        return_id: dailyReturn.return_id,
         item_id: li.item_id,
-        quantity_out: li.pieces,
+        quantity_returned: li.pieces,
         selling_price_per_unit: toNum(item.selling_price),
         purchase_price_per_unit: toNum(item.purchase_price),
         line_total: li.pieces * toNum(item.selling_price),
       };
     });
 
-    const { error: itemsErr } = await supabase.from("daily_out_items").insert(outItems);
+    const { error: itemsErr } = await supabase.from("daily_return_items").insert(returnItems);
 
     if (itemsErr) {
-      alert("Failed to save daily out items: " + itemsErr.message);
+      alert("Failed to save daily return items: " + itemsErr.message);
       setSubmitting(false);
       return;
     }
 
+    // Increment stock for returned items
     for (const li of validLines) {
-      const { error: updateErr } = await supabase.rpc("decrement_stock", {
+      const { error: updateErr } = await supabase.rpc("increment_stock", {
         p_item_id: li.item_id,
         p_quantity: li.pieces,
       }).maybeSingle();
@@ -153,7 +133,7 @@ export default function AddDailyOutForm() {
         if (item) {
           await supabase
             .from("inventory")
-            .update({ stock_quantity: item.stock_quantity - li.pieces })
+            .update({ stock_quantity: item.stock_quantity + li.pieces })
             .eq("item_id", li.item_id);
         }
       }
@@ -162,7 +142,6 @@ export default function AddDailyOutForm() {
     setSuccess(true);
     setEntries({});
     setNotes("");
-    setDiscountValue("");
     setSubmitting(false);
   }
 
@@ -181,44 +160,38 @@ export default function AddDailyOutForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {success && (
         <div className="rounded-xl border border-[var(--dms-primary)]/20 bg-[var(--dms-primary-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-primary)]">
-          Daily out recorded successfully. Stock updated.
+          Daily return recorded successfully. Stock updated.
         </div>
       )}
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Products</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{inventoryItems.length}</p>
         </div>
         <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Pieces Out</p>
-          <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{totalPiecesAdding.toLocaleString()}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Pieces Returning</p>
+          <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{totalPiecesReturning.toLocaleString()}</p>
         </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Total Selling</p>
-          <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">Rs. {totalSellingPrice.toFixed(2)}</p>
-        </div>
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Profit</p>
-          <p className={`mt-1 text-lg font-bold ${totalProfit >= 0 ? "text-[var(--dms-primary)]" : "text-[var(--dms-danger)]"}`}>
-            Rs. {totalProfit.toFixed(2)}
-          </p>
+        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3 col-span-2 sm:col-span-1">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Return Value</p>
+          <p className="mt-1 text-lg font-bold text-[var(--dms-warning)]">Rs. {totalReturnValue.toFixed(2)}</p>
         </div>
       </div>
 
       {/* Date & Notes */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <label htmlFor="out-date" className="block text-sm font-medium text-[var(--dms-text-secondary)]">Date</label>
-          <input id="out-date" type="date" value={outDate} onChange={(e) => setOutDate(e.target.value)} required
+          <label htmlFor="return-date" className="block text-sm font-medium text-[var(--dms-text-secondary)]">Date</label>
+          <input id="return-date" type="date" value={returnDate} onChange={(e) => setReturnDate(e.target.value)} required
             className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30" />
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="out-notes" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
+          <label htmlFor="return-notes" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
             Notes <span className="text-[var(--dms-text-muted)]">(optional)</span>
           </label>
-          <input id="out-notes" type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. Route A delivery"
+          <input id="return-notes" type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. Damaged goods return"
             className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30" />
         </div>
       </div>
@@ -251,7 +224,7 @@ export default function AddDailyOutForm() {
               const isActive = entry.pieces > 0;
               return (
                 <div key={item.item_id}
-                  className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-primary)]/30 bg-[var(--dms-primary-muted)]" : "border-white/[0.06] bg-white/[0.02]"}`}>
+                  className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-warning)]/30 bg-[var(--dms-warning)]/5" : "border-white/[0.06] bg-white/[0.02]"}`}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-[var(--dms-text)]">{item.item_name}</p>
@@ -279,7 +252,7 @@ export default function AddDailyOutForm() {
                   {isActive && (
                     <div className="mt-1.5 flex items-center justify-between text-[11px]">
                       <span className="text-[var(--dms-text-muted)]">({item.units_per_pack} pcs/pack)</span>
-                      <span className="font-mono font-semibold text-[var(--dms-primary)]">Rs. {lineTotal.toFixed(2)}</span>
+                      <span className="font-mono font-semibold text-[var(--dms-warning)]">Rs. {lineTotal.toFixed(2)}</span>
                     </div>
                   )}
                 </div>
@@ -289,63 +262,21 @@ export default function AddDailyOutForm() {
         </div>
       </div>
 
-      {/* Discount & Summary */}
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
-          <div className="flex-1 space-y-1.5">
-            <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Discount</p>
-            <div className="flex gap-2">
-              <button type="button" onClick={() => setDiscountType("fixed")}
-                className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "fixed" ? "bg-[var(--dms-primary)] text-slate-950" : "border border-white/[0.08] bg-white/5 text-[var(--dms-text-secondary)] hover:bg-white/10"}`}>
-                Fixed (Rs.)
-              </button>
-              <button type="button" onClick={() => setDiscountType("percentage")}
-                className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "percentage" ? "bg-[var(--dms-primary)] text-slate-950" : "border border-white/[0.08] bg-white/5 text-[var(--dms-text-secondary)] hover:bg-white/10"}`}>
-                Percentage (%)
-              </button>
-            </div>
-          </div>
-          <div className="w-full sm:w-36">
-            <input type="number" step="0.01" min={0} value={discountValue}
-              onChange={(e) => setDiscountValue(e.target.value)}
-              placeholder={discountType === "fixed" ? "0.00" : "0"}
-              className="w-full rounded-lg border border-white/[0.08] bg-[var(--dms-surface-raised)] px-3 py-2.5 text-right text-sm font-mono font-semibold text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
-          </div>
+      {/* Summary */}
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-[var(--dms-text-muted)]">Total Pieces Returning</span>
+          <span className="font-mono font-medium text-[var(--dms-text)]">{totalPiecesReturning}</span>
         </div>
-
-        <div className="border-t border-white/[0.06] pt-3 space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-[var(--dms-text-muted)]">Total Selling Price</span>
-            <span className="font-mono font-medium text-[var(--dms-text)]">Rs. {totalSellingPrice.toFixed(2)}</span>
-          </div>
-          {discountAmount > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-[var(--dms-text-muted)]">
-                Discount {discountType === "percentage" ? `(${discountValue}%)` : ""}
-              </span>
-              <span className="font-mono font-medium text-[var(--dms-danger)]">- Rs. {discountAmount.toFixed(2)}</span>
-            </div>
-          )}
-          <div className="flex justify-between text-sm font-semibold">
-            <span className="text-[var(--dms-text-secondary)]">Final Amount</span>
-            <span className="font-mono text-[var(--dms-primary)]">Rs. {finalAmount.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-[var(--dms-text-muted)]">Total Buying Cost</span>
-            <span className="font-mono font-medium text-[var(--dms-text)]">Rs. {totalBuyingCost.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-sm font-semibold border-t border-white/[0.06] pt-2">
-            <span className="text-[var(--dms-text-secondary)]">Profit</span>
-            <span className={`font-mono ${totalProfit >= 0 ? "text-[var(--dms-primary)]" : "text-[var(--dms-danger)]"}`}>
-              Rs. {totalProfit.toFixed(2)}
-            </span>
-          </div>
+        <div className="flex justify-between text-sm font-semibold border-t border-white/[0.06] pt-2">
+          <span className="text-[var(--dms-text-secondary)]">Total Return Value</span>
+          <span className="font-mono text-[var(--dms-warning)]">Rs. {totalReturnValue.toFixed(2)}</span>
         </div>
       </div>
 
       {/* Submit */}
       <button type="submit" disabled={submitting || activeEntries.length === 0}
-        className="flex h-11 w-full items-center justify-center rounded-xl bg-[var(--dms-primary)] text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/15 transition hover:bg-[var(--dms-primary-hover)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50">
+        className="flex h-11 w-full items-center justify-center rounded-xl bg-[var(--dms-warning)] text-sm font-semibold text-slate-950 shadow-md shadow-amber-500/15 transition hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50">
         {submitting ? (
           <span className="flex items-center gap-2">
             <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -355,7 +286,7 @@ export default function AddDailyOutForm() {
             Saving...
           </span>
         ) : (
-          "Record Daily Out"
+          "Record Daily Return"
         )}
       </button>
     </form>

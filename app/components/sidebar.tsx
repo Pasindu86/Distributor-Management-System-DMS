@@ -33,7 +33,7 @@ const navItems = [
   },
   {
     label: "Daily Return",
-    href: "#daily-return",
+    href: "/daily-return",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />

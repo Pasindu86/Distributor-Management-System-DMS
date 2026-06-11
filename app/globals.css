@@ -46,6 +46,17 @@ input:-webkit-autofill:focus {
   caret-color: var(--dms-text);
 }
 
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(-100%);
