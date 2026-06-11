@@ -33,6 +33,7 @@ export default function AddDailyOutForm() {
   const [outDate, setOutDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [notes, setNotes] = useState("");
   const [entries, setEntries] = useState<Record<number, ProductEntry>>({});
+  
   const [discountType, setDiscountType] = useState<"fixed" | "percentage">("fixed");
   const [discountValue, setDiscountValue] = useState<string>("");
 
@@ -75,7 +76,6 @@ export default function AddDailyOutForm() {
     const item = inventoryItems.find((i) => i.item_id === itemId);
     const unitsPerPack = item?.units_per_pack ?? 1;
     setEntries((prev) => {
-      const cur = prev[itemId] ?? { packs: 0, pieces: 0 };
       if (field === "packs") {
         return { ...prev, [itemId]: { packs: value, pieces: value * unitsPerPack } };
       }
@@ -95,6 +95,7 @@ export default function AddDailyOutForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     const validLines = activeEntries.map(([id, en]) => ({ item_id: Number(id), pieces: en.pieces }));
     if (validLines.length === 0) return;
 
@@ -181,7 +182,7 @@ export default function AddDailyOutForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {success && (
         <div className="rounded-xl border border-[var(--dms-primary)]/20 bg-[var(--dms-primary-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-primary)]">
-          Daily out recorded successfully. Stock updated.
+          Saved successfully.
         </div>
       )}
 
@@ -210,23 +211,38 @@ export default function AddDailyOutForm() {
       {/* Date & Notes */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <label htmlFor="out-date" className="block text-sm font-medium text-[var(--dms-text-secondary)]">Date</label>
-          <input id="out-date" type="date" value={outDate} onChange={(e) => setOutDate(e.target.value)} required
-            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30" />
+          <label htmlFor="out-date" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
+            Date
+          </label>
+          <input
+            id="out-date"
+            type="date"
+            value={outDate}
+            onChange={(e) => setOutDate(e.target.value)}
+            required
+            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+          />
         </div>
+
         <div className="space-y-1.5">
           <label htmlFor="out-notes" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
             Notes <span className="text-[var(--dms-text-muted)]">(optional)</span>
           </label>
-          <input id="out-notes" type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. Route A delivery"
-            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30" />
+          <input
+            id="out-notes"
+            type="text"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="e.g. Route A delivery"
+            className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+          />
         </div>
       </div>
 
       {/* Product List with Search */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Products</p>
+          <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Items</p>
           <span className="text-xs text-[var(--dms-text-muted)]">{activeEntries.length} selected</span>
         </div>
 
@@ -251,7 +267,7 @@ export default function AddDailyOutForm() {
               const isActive = entry.pieces > 0;
               return (
                 <div key={item.item_id}
-                  className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-primary)]/30 bg-[var(--dms-primary-muted)]" : "border-white/[0.06] bg-white/[0.02]"}`}>
+                  className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-primary)]/30 bg-[var(--dms-primary)]/5" : "border-white/[0.06] bg-white/[0.02]"}`}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-[var(--dms-text)]">{item.item_name}</p>
@@ -295,21 +311,38 @@ export default function AddDailyOutForm() {
           <div className="flex-1 space-y-1.5">
             <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Discount</p>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setDiscountType("fixed")}
-                className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "fixed" ? "bg-[var(--dms-primary)] text-slate-950" : "border border-white/[0.08] bg-white/5 text-[var(--dms-text-secondary)] hover:bg-white/10"}`}>
+              <button
+                type="button"
+                onClick={() => setDiscountType("fixed")}
+                className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "fixed"
+                    ? "bg-[var(--dms-primary)] text-slate-950"
+                    : "border border-white/[0.08] bg-white/5 text-[var(--dms-text-secondary)] hover:bg-white/10"
+                  }`}
+              >
                 Fixed (Rs.)
               </button>
-              <button type="button" onClick={() => setDiscountType("percentage")}
-                className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "percentage" ? "bg-[var(--dms-primary)] text-slate-950" : "border border-white/[0.08] bg-white/5 text-[var(--dms-text-secondary)] hover:bg-white/10"}`}>
+              <button
+                type="button"
+                onClick={() => setDiscountType("percentage")}
+                className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "percentage"
+                    ? "bg-[var(--dms-primary)] text-slate-950"
+                    : "border border-white/[0.08] bg-white/5 text-[var(--dms-text-secondary)] hover:bg-white/10"
+                  }`}
+              >
                 Percentage (%)
               </button>
             </div>
           </div>
           <div className="w-full sm:w-36">
-            <input type="number" step="0.01" min={0} value={discountValue}
+            <input
+              type="number"
+              step="0.01"
+              min={0}
+              value={discountValue}
               onChange={(e) => setDiscountValue(e.target.value)}
               placeholder={discountType === "fixed" ? "0.00" : "0"}
-              className="w-full rounded-lg border border-white/[0.08] bg-[var(--dms-surface-raised)] px-3 py-2.5 text-right text-sm font-mono font-semibold text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+              className="w-full rounded-lg border border-white/[0.08] bg-[var(--dms-surface-raised)] px-3 py-2.5 text-right text-sm font-mono font-semibold text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50"
+            />
           </div>
         </div>
 
@@ -344,8 +377,11 @@ export default function AddDailyOutForm() {
       </div>
 
       {/* Submit */}
-      <button type="submit" disabled={submitting || activeEntries.length === 0}
-        className="flex h-11 w-full items-center justify-center rounded-xl bg-[var(--dms-primary)] text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/15 transition hover:bg-[var(--dms-primary-hover)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50">
+      <button
+        type="submit"
+        disabled={submitting || activeEntries.length === 0}
+        className="flex h-11 w-full items-center justify-center rounded-xl bg-[var(--dms-primary)] text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/15 transition hover:bg-[var(--dms-primary-hover)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+      >
         {submitting ? (
           <span className="flex items-center gap-2">
             <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -355,7 +391,7 @@ export default function AddDailyOutForm() {
             Saving...
           </span>
         ) : (
-          "Record Daily Out"
+          "Save"
         )}
       </button>
     </form>

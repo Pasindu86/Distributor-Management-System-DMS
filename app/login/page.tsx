@@ -2,15 +2,34 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
-    router.push("/home");
+    setError(null);
+    
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      setError(signInError.message);
+      setIsSubmitting(false);
+    } else {
+      router.push("/home");
+    }
   }
 
   return (
@@ -36,6 +55,11 @@ export default function LoginPage() {
         {/* Login card */}
         <div className="rounded-2xl border border-white/[0.08] bg-[var(--dms-surface)] p-6 shadow-xl shadow-black/20 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-xl border border-[var(--dms-danger)]/20 bg-[var(--dms-danger-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-danger)]">
+                {error}
+              </div>
+            )}
             <div className="space-y-1.5">
               <label htmlFor="email" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
                 Email
