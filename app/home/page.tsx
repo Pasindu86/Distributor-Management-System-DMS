@@ -2,11 +2,13 @@
 
 import Sidebar from "../components/sidebar";
 import InventoryDashboardClient from "./inventory-dashboard-client";
+import RouteGuard from "../components/route-guard";
 
 export default function HomeDashboardPage() {
   return (
-    <div className="min-h-screen bg-[var(--dms-bg)]">
-      <Sidebar />
+    <RouteGuard>
+      <div className="min-h-screen bg-[var(--dms-bg)]">
+        <Sidebar />
 
       <main className="pt-[60px] lg:pt-0 lg:pl-[var(--dms-sidebar-width)]">
         <div className="p-3 sm:p-4 lg:p-6">
@@ -19,10 +21,10 @@ export default function HomeDashboardPage() {
           </div>
 
           {/* Inventory section - full width */}
-          <section className="rounded-xl border border-white/[0.08] bg-[var(--dms-surface)] p-3 sm:p-4 lg:p-5">
+          <section className="rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface)] p-3 sm:p-4 lg:p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-base font-semibold text-[var(--dms-text)]">Inventory</h2>
-              <span className="rounded-md bg-white/5 px-2.5 py-1 text-xs font-medium text-[var(--dms-text-muted)]">
+              <span className="rounded-md bg-[var(--dms-hover-bg)] px-2.5 py-1 text-xs font-medium text-[var(--dms-text-muted)]">
                 Live data
               </span>
             </div>
@@ -31,5 +33,6 @@ export default function HomeDashboardPage() {
         </div>
       </main>
     </div>
+    </RouteGuard>
   );
 }

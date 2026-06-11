@@ -2,15 +2,34 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
-    router.push("/home");
+    setError(null);
+    
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      setError(signInError.message);
+      setIsSubmitting(false);
+    } else {
+      router.push("/home");
+    }
   }
 
   return (
@@ -34,8 +53,13 @@ export default function LoginPage() {
         </div>
 
         {/* Login card */}
-        <div className="rounded-2xl border border-white/[0.08] bg-[var(--dms-surface)] p-6 shadow-xl shadow-black/20 sm:p-8">
+        <div className="rounded-2xl border border-[var(--dms-input-border)] bg-[var(--dms-surface)] p-6 shadow-xl shadow-black/20 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-xl border border-[var(--dms-danger)]/20 bg-[var(--dms-danger-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-danger)]">
+                {error}
+              </div>
+            )}
             <div className="space-y-1.5">
               <label htmlFor="email" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
                 Email
@@ -46,7 +70,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 placeholder="name@company.com"
-                className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+                className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
               />
             </div>
 
@@ -65,7 +89,7 @@ export default function LoginPage() {
                 type="password"
                 required
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-white/[0.08] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+                className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
               />
             </div>
 
@@ -88,7 +112,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 border-t border-white/[0.06] pt-5">
+          <div className="mt-6 border-t border-[var(--dms-card-border)] pt-5">
             <div className="grid grid-cols-3 gap-3 text-center">
               {[
                 { title: "Receive", desc: "Incoming stock" },

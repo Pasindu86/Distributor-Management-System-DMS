@@ -23,17 +23,19 @@ function toNum(v: number | string) {
   return typeof v === "number" ? v : Number(v);
 }
 
-export default function AddStockForm() {
+export default function AddDailyOutForm() {
   const [inventoryItems, setInventoryItems] = useState<InventoryOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [stockDate, setStockDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [outDate, setOutDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [notes, setNotes] = useState("");
   const [entries, setEntries] = useState<Record<number, ProductEntry>>({});
-  const [manualTotal, setManualTotal] = useState<string>("");
+  
+  const [discountType, setDiscountType] = useState<"fixed" | "percentage">("fixed");
+  const [discountValue, setDiscountValue] = useState<string>("");
 
   useEffect(() => {
     async function loadItems() {
@@ -49,16 +51,26 @@ export default function AddStockForm() {
 
   const activeEntries = Object.entries(entries).filter(([, e]) => e.pieces > 0);
 
-  const calculatedTotal = activeEntries.reduce((sum, [id, e]) => {
+  const totalSellingPrice = activeEntries.reduce((sum, [id, e]) => {
+    const item = inventoryItems.find((i) => i.item_id === Number(id));
+    if (!item) return sum;
+    return sum + e.pieces * toNum(item.selling_price);
+  }, 0);
+
+  const totalBuyingCost = activeEntries.reduce((sum, [id, e]) => {
     const item = inventoryItems.find((i) => i.item_id === Number(id));
     if (!item) return sum;
     return sum + e.pieces * toNum(item.purchase_price);
   }, 0);
 
-  const totalValue = manualTotal !== "" ? Number(manualTotal) : calculatedTotal;
+  const discountAmount =
+    discountType === "fixed"
+      ? Number(discountValue) || 0
+      : (totalSellingPrice * (Number(discountValue) || 0)) / 100;
+
+  const finalAmount = totalSellingPrice - discountAmount;
+  const totalProfit = finalAmount - totalBuyingCost;
   const totalPiecesAdding = activeEntries.reduce((s, [, e]) => s + e.pieces, 0);
-  const totalCurrentStock = inventoryItems.reduce((s, i) => s + i.stock_quantity, 0);
-  const totalPacks = inventoryItems.reduce((s, i) => s + (i.units_per_pack > 0 ? Math.floor(i.stock_quantity / i.units_per_pack) : 0), 0);
 
   function updateEntry(itemId: number, field: "packs" | "pieces", value: number) {
     const item = inventoryItems.find((i) => i.item_id === itemId);
@@ -90,34 +102,49 @@ export default function AddStockForm() {
     setSubmitting(true);
     setSuccess(false);
 
-    const { data: shipment, error: shipErr } = await supabase
-      .from("stock_shipments")
-      .insert({ stock_date: stockDate, total_value: totalValue, notes: notes || null })
-      .select("shipment_id")
+    const { data: dailyOut, error: outErr } = await supabase
+      .from("daily_out")
+      .insert({
+        out_date: outDate,
+        total_selling_price: totalSellingPrice,
+        discount_type: discountType,
+        discount_value: Number(discountValue) || 0,
+        discount_amount: discountAmount,
+        final_amount: finalAmount,
+        total_profit: totalProfit,
+        notes: notes || null,
+      })
+      .select("out_id")
       .single();
 
-    if (shipErr || !shipment) {
-      alert("Failed to create shipment: " + (shipErr?.message ?? "Unknown error"));
+    if (outErr || !dailyOut) {
+      alert("Failed to create daily out record: " + (outErr?.message ?? "Unknown error"));
       setSubmitting(false);
       return;
     }
 
-    const shipmentItems = validLines.map((li) => ({
-      shipment_id: shipment.shipment_id,
-      item_id: li.item_id,
-      quantity_added: li.pieces,
-    }));
+    const outItems = validLines.map((li) => {
+      const item = inventoryItems.find((i) => i.item_id === li.item_id)!;
+      return {
+        out_id: dailyOut.out_id,
+        item_id: li.item_id,
+        quantity_out: li.pieces,
+        selling_price_per_unit: toNum(item.selling_price),
+        purchase_price_per_unit: toNum(item.purchase_price),
+        line_total: li.pieces * toNum(item.selling_price),
+      };
+    });
 
-    const { error: itemsErr } = await supabase.from("stock_shipment_items").insert(shipmentItems);
+    const { error: itemsErr } = await supabase.from("daily_out_items").insert(outItems);
 
     if (itemsErr) {
-      alert("Failed to save shipment items: " + itemsErr.message);
+      alert("Failed to save daily out items: " + itemsErr.message);
       setSubmitting(false);
       return;
     }
 
     for (const li of validLines) {
-      const { error: updateErr } = await supabase.rpc("increment_stock", {
+      const { error: updateErr } = await supabase.rpc("decrement_stock", {
         p_item_id: li.item_id,
         p_quantity: li.pieces,
       }).maybeSingle();
@@ -127,7 +154,7 @@ export default function AddStockForm() {
         if (item) {
           await supabase
             .from("inventory")
-            .update({ stock_quantity: item.stock_quantity + li.pieces })
+            .update({ stock_quantity: item.stock_quantity - li.pieces })
             .eq("item_id", li.item_id);
         }
       }
@@ -136,7 +163,7 @@ export default function AddStockForm() {
     setSuccess(true);
     setEntries({});
     setNotes("");
-    setManualTotal("");
+    setDiscountValue("");
     setSubmitting(false);
   }
 
@@ -162,49 +189,51 @@ export default function AddStockForm() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Current Stock</p>
-          <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{totalCurrentStock.toLocaleString()}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Products</p>
+          <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{inventoryItems.length}</p>
         </div>
         <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Total Packs</p>
-          <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">{totalPacks.toLocaleString()}</p>
-        </div>
-        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Adding Now</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Pieces Out</p>
           <p className="mt-1 text-lg font-bold text-[var(--dms-text)]">{totalPiecesAdding.toLocaleString()}</p>
         </div>
         <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Shipment Value</p>
-          <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">Rs. {totalValue.toFixed(2)}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Total Selling</p>
+          <p className="mt-1 text-lg font-bold text-[var(--dms-primary)]">Rs. {totalSellingPrice.toFixed(2)}</p>
+        </div>
+        <div className="rounded-lg border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dms-text-muted)]">Profit</p>
+          <p className={`mt-1 text-lg font-bold ${totalProfit >= 0 ? "text-[var(--dms-primary)]" : "text-[var(--dms-danger)]"}`}>
+            Rs. {totalProfit.toFixed(2)}
+          </p>
         </div>
       </div>
 
       {/* Date & Notes */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <label htmlFor="stock-date" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
-            Stock Date
+          <label htmlFor="out-date" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
+            Date
           </label>
           <input
-            id="stock-date"
+            id="out-date"
             type="date"
-            value={stockDate}
-            onChange={(e) => setStockDate(e.target.value)}
+            value={outDate}
+            onChange={(e) => setOutDate(e.target.value)}
             required
             className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="notes" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
+          <label htmlFor="out-notes" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
             Notes <span className="text-[var(--dms-text-muted)]">(optional)</span>
           </label>
           <input
-            id="notes"
+            id="out-notes"
             type="text"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="e.g. Supplier invoice #123"
+            placeholder="e.g. Route A delivery"
             className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
           />
         </div>
@@ -234,7 +263,7 @@ export default function AddStockForm() {
           ) : (
             filtered.map((item) => {
               const entry = entries[item.item_id] ?? { packs: 0, pieces: 0 };
-              const lineTotal = entry.pieces > 0 ? entry.pieces * toNum(item.purchase_price) : 0;
+              const lineTotal = entry.pieces > 0 ? entry.pieces * toNum(item.selling_price) : 0;
               const isActive = entry.pieces > 0;
               return (
                 <div key={item.item_id}
@@ -243,7 +272,7 @@ export default function AddStockForm() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-[var(--dms-text)]">{item.item_name}</p>
                       <p className="text-[11px] text-[var(--dms-text-muted)]">
-                        {item.item_type} · {toNum(item.weight_grams)}g · {item.stock_quantity} pcs in stock · Rs.{toNum(item.purchase_price)} ea
+                        {item.item_type} · {toNum(item.weight_grams)}g · {item.stock_quantity} pcs in stock · Rs.{toNum(item.selling_price)} ea
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -276,24 +305,74 @@ export default function AddStockForm() {
         </div>
       </div>
 
-      {/* Total Value */}
-      <div className="rounded-xl border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <div>
-            <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Total Value</p>
-            <p className="mt-0.5 text-xs text-[var(--dms-text-muted)]">
-              Auto: Rs. {calculatedTotal.toFixed(2)} — override if needed
-            </p>
+      {/* Discount & Summary */}
+      <div className="rounded-xl border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-4 space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
+          <div className="flex-1 space-y-1.5">
+            <p className="text-sm font-medium text-[var(--dms-text-secondary)]">Discount</p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setDiscountType("fixed")}
+                className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "fixed"
+                    ? "bg-[var(--dms-primary)] text-slate-950"
+                    : "border border-[var(--dms-input-border)] bg-[var(--dms-hover-bg)] text-[var(--dms-text-secondary)] hover:bg-[var(--dms-hover-bg-strong)]"
+                  }`}
+              >
+                Fixed (Rs.)
+              </button>
+              <button
+                type="button"
+                onClick={() => setDiscountType("percentage")}
+                className={`rounded-lg px-3 py-2 text-xs font-medium transition ${discountType === "percentage"
+                    ? "bg-[var(--dms-primary)] text-slate-950"
+                    : "border border-[var(--dms-input-border)] bg-[var(--dms-hover-bg)] text-[var(--dms-text-secondary)] hover:bg-[var(--dms-hover-bg-strong)]"
+                  }`}
+              >
+                Percentage (%)
+              </button>
+            </div>
           </div>
-          <input
-            type="number"
-            step="0.01"
-            min={0}
-            value={manualTotal}
-            onChange={(e) => setManualTotal(e.target.value)}
-            placeholder={calculatedTotal.toFixed(2)}
-            className="w-full rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-3 py-2.5 text-right text-sm font-mono font-semibold text-[var(--dms-primary)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 sm:w-36"
-          />
+          <div className="w-full sm:w-36">
+            <input
+              type="number"
+              step="0.01"
+              min={0}
+              value={discountValue}
+              onChange={(e) => setDiscountValue(e.target.value)}
+              placeholder={discountType === "fixed" ? "0.00" : "0"}
+              className="w-full rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-3 py-2.5 text-right text-sm font-mono font-semibold text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50"
+            />
+          </div>
+        </div>
+
+        <div className="border-t border-[var(--dms-card-border)] pt-3 space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-[var(--dms-text-muted)]">Total Selling Price</span>
+            <span className="font-mono font-medium text-[var(--dms-text)]">Rs. {totalSellingPrice.toFixed(2)}</span>
+          </div>
+          {discountAmount > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-[var(--dms-text-muted)]">
+                Discount {discountType === "percentage" ? `(${discountValue}%)` : ""}
+              </span>
+              <span className="font-mono font-medium text-[var(--dms-danger)]">- Rs. {discountAmount.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="flex justify-between text-sm font-semibold">
+            <span className="text-[var(--dms-text-secondary)]">Final Amount</span>
+            <span className="font-mono text-[var(--dms-primary)]">Rs. {finalAmount.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-[var(--dms-text-muted)]">Total Buying Cost</span>
+            <span className="font-mono font-medium text-[var(--dms-text)]">Rs. {totalBuyingCost.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-sm font-semibold border-t border-[var(--dms-card-border)] pt-2">
+            <span className="text-[var(--dms-text-secondary)]">Profit</span>
+            <span className={`font-mono ${totalProfit >= 0 ? "text-[var(--dms-primary)]" : "text-[var(--dms-danger)]"}`}>
+              Rs. {totalProfit.toFixed(2)}
+            </span>
+          </div>
         </div>
       </div>
 
