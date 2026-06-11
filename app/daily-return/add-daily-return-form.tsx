@@ -225,38 +225,40 @@ export default function AddDailyReturnForm() {
                             return (
                                 <div key={item.item_id}
                                     className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-warning)]/30 bg-[var(--dms-warning)]/5" : "border-[var(--dms-card-border)] bg-[var(--dms-card-bg)]"}`}>
-                                    <div className="flex items-center justify-between gap-3">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                                         <div className="min-w-0 flex-1">
-                                            <p className="truncate text-sm font-medium text-[var(--dms-text)]">
+                                            <p className="text-sm font-medium text-[var(--dms-text)] leading-snug">
                                                 {item.item_name} - {item.item_type} - {toNum(item.weight_grams)}g
                                             </p>
-                                            <p className="text-[11px] text-[var(--dms-text-muted)]">
+                                            <p className="text-[11px] text-[var(--dms-text-secondary)] mt-0.5">
                                                 {item.stock_quantity} pcs in stock · Rs.{toNum(item.selling_price)}
                                             </p>
                                         </div>
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            <div className="flex items-center gap-1">
-                                                <label className="text-[10px] text-[var(--dms-text-muted)]">Pks</label>
-                                                <input type="number" min={0} value={entry.packs || ""}
-                                                    onChange={(e) => updateEntry(item.item_id, "packs", Number(e.target.value))}
-                                                    placeholder="0"
-                                                    className="w-14 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+                                        <div className="flex items-center justify-between sm:justify-end gap-3 border-t border-[var(--dms-card-border)]/50 sm:border-t-0 pt-2 sm:pt-0 mt-1.5 sm:mt-0">
+                                            <div className="text-[11px] text-[var(--dms-text-muted)] flex flex-col items-start sm:items-end leading-tight">
+                                                {isActive && (
+                                                    <span className="font-mono font-semibold text-[var(--dms-warning)]">Rs. {lineTotal.toFixed(2)}</span>
+                                                )}
+                                                <span className="text-[10px]">({item.units_per_pack} pcs/pack)</span>
                                             </div>
-                                            <div className="flex items-center gap-1">
-                                                <label className="text-[10px] text-[var(--dms-text-muted)]">Pcs</label>
-                                                <input type="number" min={0} value={entry.pieces || ""}
-                                                    onChange={(e) => updateEntry(item.item_id, "pieces", Number(e.target.value))}
-                                                    placeholder="0"
-                                                    className="w-14 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-2 py-1.5 text-center text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <div className="flex items-center gap-1">
+                                                    <label className="text-[10px] text-[var(--dms-text-muted)]">Pks</label>
+                                                    <input type="number" min={0} value={entry.packs || ""}
+                                                        onChange={(e) => updateEntry(item.item_id, "packs", Number(e.target.value))}
+                                                        placeholder="0"
+                                                        className="w-12 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-1 py-1 text-center text-xs text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <label className="text-[10px] text-[var(--dms-text-muted)]">Pcs</label>
+                                                    <input type="number" min={0} value={entry.pieces || ""}
+                                                        onChange={(e) => updateEntry(item.item_id, "pieces", Number(e.target.value))}
+                                                        placeholder="0"
+                                                        className="w-12 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-1 py-1 text-center text-xs text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    {isActive && (
-                                        <div className="mt-1.5 flex items-center justify-between text-[11px]">
-                                            <span className="text-[var(--dms-text-muted)]">({item.units_per_pack} pcs/pack)</span>
-                                            <span className="font-mono font-semibold text-[var(--dms-warning)]">Rs. {lineTotal.toFixed(2)}</span>
-                                        </div>
-                                    )}
                                 </div>
                             );
                         })
