@@ -55,7 +55,7 @@ export default function InventoryDashboardClient() {
       const { data, error: queryError } = await supabase
         .from("inventory")
         .select("item_id, item_name, item_type, weight_grams, purchase_price, selling_price, units_per_pack, stock_quantity, created_at, updated_at")
-        .order("updated_at", { ascending: false });
+        .order("item_id", { ascending: true });
 
       if (!isActive) return;
 

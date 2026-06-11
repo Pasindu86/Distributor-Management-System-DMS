@@ -40,7 +40,7 @@ export default function AddStockForm() {
       const { data } = await supabase
         .from("inventory")
         .select("item_id, item_name, item_type, weight_grams, purchase_price, selling_price, units_per_pack, stock_quantity")
-        .order("item_name");
+        .order("item_id", { ascending: true });
       setInventoryItems((data ?? []) as InventoryOption[]);
       setLoading(false);
     }
@@ -241,9 +241,11 @@ export default function AddStockForm() {
                   className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-primary)]/30 bg-[var(--dms-primary)]/5" : "border-[var(--dms-card-border)] bg-[var(--dms-card-bg)]"}`}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-[var(--dms-text)]">{item.item_name}</p>
+                      <p className="truncate text-sm font-medium text-[var(--dms-text)]">
+                        {item.item_name} - {item.item_type} - {toNum(item.weight_grams)}g
+                      </p>
                       <p className="text-[11px] text-[var(--dms-text-muted)]">
-                        {item.item_type} · {toNum(item.weight_grams)}g · {item.stock_quantity} pcs in stock · Rs.{toNum(item.purchase_price)} ea
+                        {item.stock_quantity} pcs in stock · Rs.{toNum(item.purchase_price)}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
