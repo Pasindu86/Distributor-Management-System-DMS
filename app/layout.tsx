@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/lib/theme-context";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,22 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             {children}
+            <Toaster 
+              position="top-right"
+              toastOptions={{
+                style: {
+                  background: 'var(--dms-surface)',
+                  color: 'var(--dms-text)',
+                  border: '1px solid var(--dms-card-border)',
+                },
+                success: {
+                  iconTheme: {
+                    primary: 'var(--dms-primary)',
+                    secondary: 'white',
+                  },
+                },
+              }}
+            />
           </AuthProvider>
         </ThemeProvider>
       </body>

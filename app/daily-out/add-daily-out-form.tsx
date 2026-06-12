@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { toast } from "react-hot-toast";
 
 interface InventoryOption {
   item_id: number;
@@ -74,13 +75,23 @@ export default function AddDailyOutForm() {
 
   function updateEntry(itemId: number, field: "packs" | "pieces", value: number) {
     const item = inventoryItems.find((i) => i.item_id === itemId);
-    const unitsPerPack = item?.units_per_pack ?? 1;
-    setEntries((prev) => {
-      if (field === "packs") {
-        return { ...prev, [itemId]: { packs: value, pieces: value * unitsPerPack } };
-      }
-      return { ...prev, [itemId]: { pieces: value, packs: unitsPerPack > 0 ? Math.floor(value / unitsPerPack) : 0 } };
-    });
+    if (!item) return;
+
+    const unitsPerPack = item.units_per_pack ?? 1;
+    let newPieces = field === "packs" ? value * unitsPerPack : value;
+
+    // Prevent negative and exceeding stock
+    if (newPieces < 0) newPieces = 0;
+    if (newPieces > item.stock_quantity) {
+      newPieces = item.stock_quantity;
+    }
+
+    const newPacks = unitsPerPack > 0 ? Math.floor(newPieces / unitsPerPack) : 0;
+
+    setEntries((prev) => ({
+      ...prev,
+      [itemId]: { packs: newPacks, pieces: newPieces }
+    }));
   }
 
   const filtered = inventoryItems.filter((item) => {
@@ -98,6 +109,15 @@ export default function AddDailyOutForm() {
 
     const validLines = activeEntries.map(([id, en]) => ({ item_id: Number(id), pieces: en.pieces }));
     if (validLines.length === 0) return;
+
+    // Validate stock before submission
+    for (const li of validLines) {
+      const item = inventoryItems.find((i) => i.item_id === li.item_id);
+      if (item && li.pieces > item.stock_quantity) {
+        toast.error(`Cannot out ${li.pieces} pcs of ${item.item_name}. Only ${item.stock_quantity} pcs in stock!`);
+        return;
+      }
+    }
 
     setSubmitting(true);
     setSuccess(false);
@@ -118,7 +138,7 @@ export default function AddDailyOutForm() {
       .single();
 
     if (outErr || !dailyOut) {
-      alert("Failed to create daily out record: " + (outErr?.message ?? "Unknown error"));
+      toast.error("Failed to create daily out record: " + (outErr?.message ?? "Unknown error"));
       setSubmitting(false);
       return;
     }
@@ -138,7 +158,7 @@ export default function AddDailyOutForm() {
     const { error: itemsErr } = await supabase.from("daily_out_items").insert(outItems);
 
     if (itemsErr) {
-      alert("Failed to save daily out items: " + itemsErr.message);
+      toast.error("Failed to save daily out items: " + itemsErr.message);
       setSubmitting(false);
       return;
     }
@@ -160,6 +180,7 @@ export default function AddDailyOutForm() {
       }
     }
 
+    toast.success("Daily out recorded successfully!");
     setSuccess(true);
     setEntries({});
     setNotes("");
@@ -180,11 +201,6 @@ export default function AddDailyOutForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {success && (
-        <div className="rounded-xl border border-[var(--dms-primary)]/20 bg-[var(--dms-primary-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-primary)]">
-          Saved successfully.
-        </div>
-      )}
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -287,14 +303,14 @@ export default function AddDailyOutForm() {
                       <div className="flex items-center gap-2 shrink-0">
                         <div className="flex items-center gap-1">
                           <label className="text-[10px] text-[var(--dms-text-muted)]">Pks</label>
-                          <input type="number" min={0} value={entry.packs || ""}
+                          <input type="number" min={0} max={item.units_per_pack > 0 ? Math.floor(item.stock_quantity / item.units_per_pack) : 0} value={entry.packs || ""}
                             onChange={(e) => updateEntry(item.item_id, "packs", Number(e.target.value))}
                             placeholder="0"
                             className="w-12 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-1 py-1 text-center text-xs text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
                         </div>
                         <div className="flex items-center gap-1">
                           <label className="text-[10px] text-[var(--dms-text-muted)]">Pcs</label>
-                          <input type="number" min={0} value={entry.pieces || ""}
+                          <input type="number" min={0} max={item.stock_quantity} value={entry.pieces || ""}
                             onChange={(e) => updateEntry(item.item_id, "pieces", Number(e.target.value))}
                             placeholder="0"
                             className="w-12 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-1 py-1 text-center text-xs text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />

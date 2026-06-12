@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { toast } from "react-hot-toast";
 
 interface ProductFormData {
   item_name: string;
@@ -53,10 +54,12 @@ export default function AddProductForm() {
 
     if (insertErr) {
       setError(insertErr.message);
+      toast.error(insertErr.message);
       setSubmitting(false);
       return;
     }
 
+    toast.success("Product added successfully!");
     setSuccess(true);
     setForm(emptyForm);
     setSubmitting(false);
@@ -67,16 +70,6 @@ export default function AddProductForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {success && (
-        <div className="rounded-xl border border-[var(--dms-primary)]/20 bg-[var(--dms-primary-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-primary)]">
-          Product added successfully!
-        </div>
-      )}
-      {error && (
-        <div className="rounded-xl border border-[var(--dms-danger)]/20 bg-[var(--dms-danger-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-danger)]">
-          {error}
-        </div>
-      )}
 
       {/* Product Info */}
       <div className="rounded-xl border border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] p-4 space-y-4">
