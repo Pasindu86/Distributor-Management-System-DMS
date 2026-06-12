@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { toast } from "react-hot-toast";
 
 interface InventoryOption {
     item_id: number;
@@ -96,7 +97,7 @@ export default function AddDailyReturnForm() {
             .single();
 
         if (retErr || !dailyReturn) {
-            alert("Failed to create daily return record: " + (retErr?.message ?? "Unknown error"));
+            toast.error("Failed to create daily return record: " + (retErr?.message ?? "Unknown error"));
             setSubmitting(false);
             return;
         }
@@ -116,7 +117,7 @@ export default function AddDailyReturnForm() {
         const { error: itemsErr } = await supabase.from("daily_return_items").insert(returnItems);
 
         if (itemsErr) {
-            alert("Failed to save daily return items: " + itemsErr.message);
+            toast.error("Failed to save daily return items: " + itemsErr.message);
             setSubmitting(false);
             return;
         }
@@ -139,6 +140,7 @@ export default function AddDailyReturnForm() {
             }
         }
 
+        toast.success("Daily return recorded successfully.");
         setSuccess(true);
         setEntries({});
         setNotes("");
@@ -158,11 +160,6 @@ export default function AddDailyReturnForm() {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-5">
-            {success && (
-                <div className="rounded-xl border border-[var(--dms-primary)]/20 bg-[var(--dms-primary-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-primary)]">
-                    Daily return recorded successfully. Stock updated.
-                </div>
-            )}
 
             {/* Stats cards */}
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">

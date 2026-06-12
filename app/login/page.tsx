@@ -1,11 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import RouteGuard from "../components/route-guard";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
@@ -27,14 +26,15 @@ export default function LoginPage() {
     if (signInError) {
       setError(signInError.message);
       setIsSubmitting(false);
-    } else {
-      router.push("/home");
     }
+    // Do not router.push here. RouteGuard will automatically redirect 
+    // when the auth state changes globally.
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[var(--dms-bg)] px-4 py-8">
-      {/* Background decorative elements */}
+    <RouteGuard>
+      <main className="flex min-h-screen flex-col items-center justify-center bg-[var(--dms-bg)] px-4 py-8">
+        {/* Background decorative elements */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-[var(--dms-primary)]/5 blur-[100px]" />
         <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-[var(--dms-primary)]/3 blur-[100px]" />
@@ -133,5 +133,6 @@ export default function LoginPage() {
         </p>
       </div>
     </main>
+    </RouteGuard>
   );
 }

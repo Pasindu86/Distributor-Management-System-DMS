@@ -53,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function fetchRole(userId: string) {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from("profiles")

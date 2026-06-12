@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { toast } from "react-hot-toast";
 
 interface InventoryOption {
   item_id: number;
@@ -97,7 +98,7 @@ export default function AddStockForm() {
       .single();
 
     if (shipErr || !shipment) {
-      alert("Failed to create shipment: " + (shipErr?.message ?? "Unknown error"));
+      toast.error("Failed to create shipment: " + (shipErr?.message ?? "Unknown error"));
       setSubmitting(false);
       return;
     }
@@ -111,7 +112,7 @@ export default function AddStockForm() {
     const { error: itemsErr } = await supabase.from("stock_shipment_items").insert(shipmentItems);
 
     if (itemsErr) {
-      alert("Failed to save shipment items: " + itemsErr.message);
+      toast.error("Failed to save shipment items: " + itemsErr.message);
       setSubmitting(false);
       return;
     }
@@ -133,6 +134,7 @@ export default function AddStockForm() {
       }
     }
 
+    toast.success("Stock added successfully!");
     setSuccess(true);
     setEntries({});
     setNotes("");
@@ -153,11 +155,6 @@ export default function AddStockForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {success && (
-        <div className="rounded-xl border border-[var(--dms-primary)]/20 bg-[var(--dms-primary-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-primary)]">
-          Saved successfully.
-        </div>
-      )}
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
