@@ -14,10 +14,7 @@ export default function ReportPage() {
           <div className="p-3 sm:p-4 lg:p-6">
             {/* Page header */}
             <div className="mb-5">
-              <h1 className="text-2xl font-bold text-[var(--dms-text)] sm:text-3xl">Monthly Report</h1>
-              <p className="mt-1 text-sm text-[var(--dms-text-muted)]">
-                Analyze monthly profit margins, sales trends, product performance, and stock valuation.
-              </p>
+              <h1 className="text-2xl font-bold text-[var(--dms-text)]">Reports</h1>
             </div>
 
             {/* Report Content */}

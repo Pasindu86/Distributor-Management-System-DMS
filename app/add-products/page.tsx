@@ -13,10 +13,7 @@ export default function AddProductsPage() {
       <main className="pt-[60px] lg:pt-0 lg:pl-[var(--dms-sidebar-width)]">
         <div className="p-3 sm:p-4 lg:p-6">
           <div className="mb-5">
-            <h1 className="text-2xl font-bold text-[var(--dms-text)] sm:text-3xl">Add Products</h1>
-            <p className="mt-1 text-sm text-[var(--dms-text-muted)]">
-              Add new products to your inventory catalog.
-            </p>
+            <h1 className="text-2xl font-bold text-[var(--dms-text)]">Add Products</h1>
           </div>
 
           <AddProductForm />
