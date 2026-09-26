@@ -16,8 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Distributor Management System",
-  description: "Distributor Management System for tracking goods, billing, and deliveries.",
+  title: "Ajith Distributor - Ampara",
+  description: "Ajith Distributor Management System – Ampara. Track goods, billing, and deliveries.",
+  icons: {
+    icon: "/AD_logo.svg",
+    shortcut: "/AD_logo.svg",
+    apple: "/AD_logo.svg",
+  },
 };
 
 export default function RootLayout({

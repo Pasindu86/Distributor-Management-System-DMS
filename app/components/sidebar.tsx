@@ -89,9 +89,12 @@ export default function Sidebar() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <div className="flex items-center gap-2.5">
-          <Logo size={28} />
-          <span className="text-sm font-semibold text-[var(--dms-text)]">DMS</span>
+        <div className="flex items-center gap-3">
+          <Logo size={36} />
+          <div className="flex flex-col">
+            <span className="text-base font-bold text-[var(--dms-text)] leading-tight">Ajith Distributor</span>
+            <span className="text-[11px] font-medium text-[var(--dms-text-muted)] uppercase tracking-wider">Ampara</span>
+          </div>
         </div>
       </header>
 
@@ -139,9 +142,12 @@ function SidebarContent({
   return (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="mb-6 flex items-center gap-2.5 px-1">
-        <Logo size={32} />
-        <p className="text-sm font-bold text-[var(--dms-text)] tracking-tight">DMS</p>
+      <div className="mb-6 flex items-center gap-3 px-1">
+        <Logo size={42} />
+        <div className="flex flex-col">
+          <p className="text-base font-bold text-[var(--dms-text)] tracking-tight leading-tight">Ajith Distributor</p>
+          <p className="text-[11px] font-medium text-[var(--dms-text-muted)] uppercase tracking-wider">Ampara</p>
+        </div>
       </div>
 
       {/* Navigation */}

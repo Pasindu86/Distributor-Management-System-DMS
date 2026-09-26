@@ -44,8 +44,11 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-[380px]">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-3">
-          <Logo size={44} />
-          <h1 className="text-lg font-bold text-[var(--dms-text)]">DMS</h1>
+          <Logo size={68} />
+          <div className="flex flex-col items-center">
+            <h1 className="text-2xl font-bold text-[var(--dms-text)]">Ajith Distributor</h1>
+            <p className="text-sm font-medium text-[var(--dms-text-muted)] uppercase tracking-wider">Ampara</p>
+          </div>
         </div>
 
         {/* Login card */}
