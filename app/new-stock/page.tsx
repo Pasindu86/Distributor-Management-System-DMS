@@ -29,10 +29,7 @@ export default function NewStockPage() {
         <div className="p-3 sm:p-4 lg:p-6">
           {/* Page header */}
           <div className="mb-5">
-            <h1 className="text-2xl font-bold text-[var(--dms-text)] sm:text-3xl">New Stock</h1>
-            <p className="mt-1 text-sm text-[var(--dms-text-muted)]">
-              Record incoming shipments and view purchase history.
-            </p>
+            <h1 className="text-2xl font-bold text-[var(--dms-text)]">New Stock</h1>
           </div>
 
           {/* Tabs - full width */}

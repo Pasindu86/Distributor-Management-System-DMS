@@ -124,7 +124,7 @@ export default function InventoryDashboardClient() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
-          <p className="text-sm text-[var(--dms-text-muted)]">No inventory items found.</p>
+          <p className="text-sm text-[var(--dms-text-muted)]">No items yet</p>
         </div>
       </div>
     );
@@ -166,7 +166,7 @@ export default function InventoryDashboardClient() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, category, or weight..."
+            placeholder="Search..."
             className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] py-2.5 pl-10 pr-4 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
           />
           {search && (

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import { supabase } from "@/lib/supabase/client";
+import Logo from "./logo";
 
 const navItems = [
   {
@@ -58,7 +59,7 @@ const navItems = [
     roles: ["admin"],
   },
   {
-    label: "Report (Monthly)",
+    label: "Reports",
     href: "/report",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -89,10 +90,11 @@ export default function Sidebar() {
           </svg>
         </button>
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--dms-primary)] font-bold text-slate-950 text-sm">
-            D
+          <Logo size={36} />
+          <div className="flex flex-col">
+            <span className="text-base font-bold text-[var(--dms-text)] leading-tight">Ajith Distributor</span>
+            <span className="text-[11px] font-medium text-[var(--dms-text-muted)] uppercase tracking-wider">Ampara</span>
           </div>
-          <span className="text-sm font-semibold text-[var(--dms-text)]">DMS</span>
         </div>
       </header>
 
@@ -105,7 +107,7 @@ export default function Sidebar() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             aria-label="Close menu"
           />
-          <aside className="absolute left-0 top-0 h-full w-[280px] animate-[slideIn_0.2s_ease-out] border-r border-[var(--dms-input-border)] bg-[var(--dms-surface)] p-4">
+          <aside className="absolute left-0 top-0 h-full w-[260px] animate-[slideIn_0.2s_ease-out] border-r border-[var(--dms-input-border)] bg-[var(--dms-surface)] p-4">
             <SidebarContent pathname={pathname} onNavigate={() => setIsOpen(false)} />
           </aside>
         </div>
@@ -140,15 +142,16 @@ function SidebarContent({
   return (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="mb-8 flex items-center gap-3 px-2">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--dms-primary)] font-bold text-slate-950">
-          D
+      <div className="mb-6 flex items-center gap-3 px-1">
+        <Logo size={42} />
+        <div className="flex flex-col">
+          <p className="text-base font-bold text-[var(--dms-text)] tracking-tight leading-tight">Ajith Distributor</p>
+          <p className="text-[11px] font-medium text-[var(--dms-text-muted)] uppercase tracking-wider">Ampara</p>
         </div>
-        <p className="text-base font-bold text-[var(--dms-text)] tracking-tight">DMS</p>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1">
+      <nav className="flex-1 space-y-0.5">
         {visibleNavItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -156,7 +159,7 @@ function SidebarContent({
               key={item.label}
               href={item.href}
               onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${
                 isActive
                   ? "bg-[var(--dms-primary-muted)] text-[var(--dms-primary-hover)]"
                   : "text-[var(--dms-text-secondary)] hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-text)]"
@@ -170,11 +173,11 @@ function SidebarContent({
       </nav>
 
       {/* Bottom section */}
-      <div className="border-t border-[var(--dms-input-border)] pt-4 space-y-3">
+      <div className="border-t border-[var(--dms-input-border)] pt-3 space-y-1">
         {/* Theme toggle */}
         <button
           onClick={toggleTheme}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[var(--dms-text-secondary)] transition hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-text)]"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium text-[var(--dms-text-secondary)] transition hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-text)]"
         >
           {theme === "dark" ? (
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -188,29 +191,17 @@ function SidebarContent({
           {theme === "dark" ? "Light mode" : "Dark mode"}
         </button>
 
-        {/* User info */}
-        <div className="flex items-center justify-between rounded-xl px-3 py-2.5">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--dms-surface-raised)] text-xs font-semibold text-[var(--dms-text-secondary)]">
-              {user?.email?.charAt(0).toUpperCase() || "U"}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="truncate text-sm font-medium text-[var(--dms-text)]">{user?.email?.split('@')[0] || "User"}</p>
-              <p className="truncate text-[11px] text-[var(--dms-text-muted)] capitalize">{role || "Distributor"}</p>
-            </div>
-          </div>
-          <button 
-            onClick={handleLogout}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--dms-text-muted)] transition hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-danger)]"
-            title="Log out"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-          </button>
-        </div>
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium text-[var(--dms-text-muted)] transition hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-danger)]"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Log out
+        </button>
       </div>
     </div>
   );
 }
-

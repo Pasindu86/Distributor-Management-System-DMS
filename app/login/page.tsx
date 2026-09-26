@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import RouteGuard from "../components/route-guard";
+import Logo from "../components/logo";
 
 export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,21 +41,19 @@ export default function LoginPage() {
         <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-[var(--dms-primary)]/3 blur-[100px]" />
       </div>
 
-      <div className="relative z-10 w-full max-w-[420px]">
+      <div className="relative z-10 w-full max-w-[380px]">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--dms-primary)] text-xl font-bold text-slate-950 shadow-lg shadow-emerald-500/20">
-            D
-          </div>
-          <div className="text-center">
-            <h1 className="text-xl font-bold text-[var(--dms-text)]">Distributor Management</h1>
-            <p className="mt-1 text-sm text-[var(--dms-text-muted)]">Sign in to your account</p>
+          <Logo size={68} />
+          <div className="flex flex-col items-center">
+            <h1 className="text-2xl font-bold text-[var(--dms-text)]">Ajith Distributor</h1>
+            <p className="text-sm font-medium text-[var(--dms-text-muted)] uppercase tracking-wider">Ampara</p>
           </div>
         </div>
 
         {/* Login card */}
-        <div className="rounded-2xl border border-[var(--dms-input-border)] bg-[var(--dms-surface)] p-6 shadow-xl shadow-black/20 sm:p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="rounded-2xl border border-[var(--dms-input-border)] bg-[var(--dms-surface)] p-6 shadow-xl shadow-black/20">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="rounded-xl border border-[var(--dms-danger)]/20 bg-[var(--dms-danger-muted)] px-4 py-3 text-sm font-medium text-[var(--dms-danger)]">
                 {error}
@@ -70,33 +69,28 @@ export default function LoginPage() {
                 type="email"
                 required
                 placeholder="name@company.com"
-                className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+                className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-2.5 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
               />
             </div>
 
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
-                  Password
-                </label>
-                <a href="#" className="text-xs font-medium text-[var(--dms-primary)] hover:text-[var(--dms-primary-hover)] transition">
-                  Forgot password?
-                </a>
-              </div>
+              <label htmlFor="password" className="block text-sm font-medium text-[var(--dms-text-secondary)]">
+                Password
+              </label>
               <input
                 id="password"
                 name="password"
                 type="password"
                 required
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-3 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
+                className="w-full rounded-xl border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-4 py-2.5 text-sm text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/30"
               />
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-2 flex h-11 w-full items-center justify-center rounded-xl bg-[var(--dms-primary)] text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/15 transition hover:bg-[var(--dms-primary-hover)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-1 flex h-10 w-full items-center justify-center rounded-xl bg-[var(--dms-primary)] text-sm font-semibold text-slate-950 transition hover:bg-[var(--dms-primary-hover)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
@@ -104,33 +98,14 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Signing in...
+                  Signing in…
                 </span>
               ) : (
                 "Sign in"
               )}
             </button>
           </form>
-
-          <div className="mt-6 border-t border-[var(--dms-card-border)] pt-5">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              {[
-                { title: "Receive", desc: "Incoming stock" },
-                { title: "Bill", desc: "Track billing" },
-                { title: "Deliver", desc: "Shop dispatch" },
-              ].map((item) => (
-                <div key={item.title} className="rounded-lg bg-white/[0.03] px-2 py-3">
-                  <p className="text-xs font-semibold text-[var(--dms-text)]">{item.title}</p>
-                  <p className="mt-0.5 text-[10px] text-[var(--dms-text-muted)]">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
-
-        <p className="mt-5 text-center text-xs text-[var(--dms-text-muted)]">
-          Supabase auth activates once environment keys are configured.
-        </p>
       </div>
     </main>
     </RouteGuard>
