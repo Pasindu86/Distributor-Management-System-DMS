@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "react-hot-toast";
 
@@ -30,10 +30,13 @@ export default function AddDailyReturnForm() {
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
 
     const [returnDate, setReturnDate] = useState(() => new Date().toISOString().split("T")[0]);
     const [notes, setNotes] = useState("");
     const [entries, setEntries] = useState<Record<number, ProductEntry>>({});
+
+    const pcsInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
     useEffect(() => {
         async function loadItems() {
@@ -46,6 +49,18 @@ export default function AddDailyReturnForm() {
         }
         loadItems();
     }, []);
+
+    // Auto-focus Pcs input when a single search result is found
+    useEffect(() => {
+        if (searchQuery.trim() && filtered.length === 1) {
+            const item = filtered[0];
+            setSelectedItemId(item.item_id);
+            setTimeout(() => {
+                pcsInputRefs.current[item.item_id]?.focus();
+            }, 50);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchQuery]);
 
     const activeEntries = Object.entries(entries).filter(([, e]) => e.pieces > 0);
 
@@ -77,6 +92,13 @@ export default function AddDailyReturnForm() {
             String(toNum(item.weight_grams)).includes(q)
         );
     });
+
+    function handleRowClick(itemId: number) {
+        setSelectedItemId(itemId);
+        setTimeout(() => {
+            pcsInputRefs.current[itemId]?.focus();
+        }, 0);
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -144,6 +166,7 @@ export default function AddDailyReturnForm() {
         setSuccess(true);
         setEntries({});
         setNotes("");
+        setSelectedItemId(null);
         setSubmitting(false);
     }
 
@@ -219,9 +242,17 @@ export default function AddDailyReturnForm() {
                             const entry = entries[item.item_id] ?? { packs: 0, pieces: 0 };
                             const lineTotal = entry.pieces > 0 ? entry.pieces * toNum(item.selling_price) : 0;
                             const isActive = entry.pieces > 0;
+                            const isSelected = selectedItemId === item.item_id;
                             return (
                                 <div key={item.item_id}
-                                    className={`rounded-lg border p-3 transition ${isActive ? "border-[var(--dms-warning)]/30 bg-[var(--dms-warning)]/5" : "border-[var(--dms-card-border)] bg-[var(--dms-card-bg)]"}`}>
+                                    onClick={() => handleRowClick(item.item_id)}
+                                    className={`rounded-lg border p-3 transition cursor-pointer ${
+                                        isActive
+                                            ? "border-[var(--dms-warning)]/30 bg-[var(--dms-warning)]/5"
+                                            : isSelected
+                                                ? "border-[var(--dms-warning)]/20 bg-[var(--dms-warning)]/[0.03] ring-1 ring-[var(--dms-warning)]/10"
+                                                : "border-[var(--dms-card-border)] bg-[var(--dms-card-bg)] hover:bg-[var(--dms-hover-bg)]"
+                                    }`}>
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                                         <div className="min-w-0 flex-1">
                                             <p className="text-sm font-medium text-[var(--dms-text)] leading-snug">
@@ -240,18 +271,21 @@ export default function AddDailyReturnForm() {
                                             </div>
                                             <div className="flex items-center gap-2 shrink-0">
                                                 <div className="flex items-center gap-1">
-                                                    <label className="text-[10px] text-[var(--dms-text-muted)]">Pks</label>
-                                                    <input type="number" min={0} value={entry.packs || ""}
-                                                        onChange={(e) => updateEntry(item.item_id, "packs", Number(e.target.value))}
-                                                        placeholder="0"
-                                                        className="w-12 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-1 py-1 text-center text-xs text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
-                                                </div>
-                                                <div className="flex items-center gap-1">
                                                     <label className="text-[10px] text-[var(--dms-text-muted)]">Pcs</label>
                                                     <input type="number" min={0} value={entry.pieces || ""}
+                                                        ref={(el) => { pcsInputRefs.current[item.item_id] = el; }}
+                                                        onClick={(e) => e.stopPropagation()}
                                                         onChange={(e) => updateEntry(item.item_id, "pieces", Number(e.target.value))}
                                                         placeholder="0"
-                                                        className="w-12 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-1 py-1 text-center text-xs text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
+                                                        className="w-14 sm:w-12 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-1 py-1.5 sm:py-1 text-center text-xs text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50 focus:ring-1 focus:ring-[var(--dms-primary)]/20" />
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <label className="text-[10px] text-[var(--dms-text-muted)]">Pks</label>
+                                                    <input type="number" min={0} value={entry.packs || ""}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        onChange={(e) => updateEntry(item.item_id, "packs", Number(e.target.value))}
+                                                        placeholder="0"
+                                                        className="w-14 sm:w-12 rounded-lg border border-[var(--dms-input-border)] bg-[var(--dms-surface-raised)] px-1 py-1.5 sm:py-1 text-center text-xs text-[var(--dms-text)] outline-none transition placeholder:text-[var(--dms-text-muted)] focus:border-[var(--dms-primary)]/50" />
                                                 </div>
                                             </div>
                                         </div>
@@ -292,4 +326,4 @@ export default function AddDailyReturnForm() {
             </button>
         </form>
     );
-}
+}

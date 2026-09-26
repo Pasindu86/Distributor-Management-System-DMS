@@ -18,16 +18,7 @@ const navItems = [
     ),
     roles: ["admin", "user"],
   },
-  {
-    label: "New Stock",
-    href: "/new-stock",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-      </svg>
-    ),
-    roles: ["admin"],
-  },
+
   {
     label: "Daily Out",
     href: "/daily-out",
@@ -49,11 +40,11 @@ const navItems = [
     roles: ["admin"],
   },
   {
-    label: "Add Products",
-    href: "/add-products",
+    label: "New Stock",
+    href: "/new-stock",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
       </svg>
     ),
     roles: ["admin"],
@@ -69,6 +60,17 @@ const navItems = [
     ),
     roles: ["admin"],
   },
+  {
+    label: "Add Products",
+    href: "/add-products",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+    ),
+    roles: ["admin"],
+  },
+
 ];
 
 export default function Sidebar() {
@@ -159,11 +161,10 @@ function SidebarContent({
               key={item.label}
               href={item.href}
               onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${
-                isActive
-                  ? "bg-[var(--dms-primary-muted)] text-[var(--dms-primary-hover)]"
-                  : "text-[var(--dms-text-secondary)] hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-text)]"
-              }`}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${isActive
+                ? "bg-[var(--dms-primary-muted)] text-[var(--dms-primary-hover)]"
+                : "text-[var(--dms-text-secondary)] hover:bg-[var(--dms-hover-bg)] hover:text-[var(--dms-text)]"
+                }`}
             >
               <span className={isActive ? "text-[var(--dms-primary)]" : ""}>{item.icon}</span>
               {item.label}
